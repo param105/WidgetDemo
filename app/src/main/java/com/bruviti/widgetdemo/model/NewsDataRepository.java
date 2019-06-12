@@ -3,6 +3,7 @@ package com.bruviti.widgetdemo.model;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.bruviti.widgetdemo.model.database.NewsDatabase;
@@ -19,12 +20,12 @@ public class NewsDataRepository {
     private MutableLiveData<List<Article>> articals = new MutableLiveData<>();
 
 
-    NewsDataRepository(Context context){
+    public NewsDataRepository(Context context){
         newsDatabase = NewsDatabase.getDatabase(context);
         articleDao = newsDatabase.articleDao();
     }
 
-    public MutableLiveData<List<Article>> getAllArticles(){
+    public LiveData<List<Article>> getAllArticles(){
         return articleDao.getAllArticles();
     }
 

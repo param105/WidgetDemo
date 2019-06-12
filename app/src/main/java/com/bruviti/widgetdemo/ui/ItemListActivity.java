@@ -4,22 +4,28 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
 import com.bruviti.widgetdemo.R;
 import com.bruviti.widgetdemo.adapter.NewsListAdapter;
+import com.bruviti.widgetdemo.model.NewsDataRepository;
 import com.bruviti.widgetdemo.model.entity.Article;
 import com.bruviti.widgetdemo.model.entity.JsonResponseObject;
 import com.bruviti.widgetdemo.util.ApiService;
 import com.bruviti.widgetdemo.util.RetrofitClient;
+import com.bruviti.widgetdemo.viewmodel.ArticleViewModel;
 
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -43,14 +49,17 @@ public class ItemListActivity extends AppCompatActivity {
      */
     public static String TAG ="ItemListActivity";
     private boolean mTwoPane = false;
-    ArrayList<Article> articleList = new ArrayList<Article>();
-    View recyclerView ;
+    List<Article> articleList = new ArrayList<Article>();
+    RecyclerView recyclerView ;
+    ArticleViewModel articleViewModel ;
+    NewsListAdapter recyclerAdapter;
+    NewsDataRepository newsDataRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_list);
-
+        newsDataRepository = new NewsDataRepository(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
@@ -64,12 +73,32 @@ public class ItemListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
-         recyclerView = findViewById(R.id.item_list);
+        recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
 
+        setupRecyclerView(recyclerView);
+        setUpArticleViewModel();
         fetchNews();
 
 
+    }
+
+    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
+        recyclerAdapter = new NewsListAdapter(this,articleList,mTwoPane);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        recyclerView.setAdapter(recyclerAdapter);
+    }
+
+    private void setUpArticleViewModel() {
+        articleViewModel = ViewModelProviders.of(this).get(ArticleViewModel.class);
+        articleViewModel.getArticles().observe(this, new Observer<List<Article>>() {
+            @Override
+            public void onChanged(List<Article> articles) {
+                articleList = articles;
+                recyclerAdapter.notifyDataSetChanged();
+
+            }
+        });
     }
 
     /***
@@ -87,7 +116,8 @@ public class ItemListActivity extends AppCompatActivity {
 
                 if(response.isSuccessful()){
                     articleList.addAll(responsedata.getArticles());
-                    setupRecyclerView((RecyclerView) recyclerView);
+                    newsDataRepository.insertArticals(articleList);
+                    //setupRecyclerView((RecyclerView) recyclerView);
                     Log.d(TAG,"Response received is :- "+ articleList.toString());
                 }else{
                     Toast.makeText(getApplicationContext(),"Fetching issue", LENGTH_SHORT).show();
@@ -102,11 +132,7 @@ public class ItemListActivity extends AppCompatActivity {
         });
     }
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        NewsListAdapter recyclerAdapter = new NewsListAdapter(this,articleList,mTwoPane);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        recyclerView.setAdapter(recyclerAdapter);
-    }
+
 
 
 }

@@ -15,7 +15,7 @@ import java.util.List;
 public interface ArticleDao {
 
     @Query("Select * from ARTICLES")
-    MutableLiveData<List<Article>> getAllArticles();
+    LiveData<List<Article>> getAllArticles();
 
     @Insert
     void insert(Article article);

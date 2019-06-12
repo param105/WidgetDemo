@@ -20,18 +20,19 @@ import com.bruviti.widgetdemo.model.entity.Article;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.ListViewHolder> {
     public String TAG = "NewsAdapter";
 
     ItemListActivity parentActivity;
     LayoutInflater inflater;
-    ArrayList<Article> articleArrayList;
+    List<Article> articleArrayList;
     private View.OnClickListener itemClickListener;
     private boolean mTwoPane = false;
 
 
-    public NewsListAdapter(ItemListActivity parentActivity, ArrayList<Article> dataDataModelArrayList,boolean mTwoPane){
+    public NewsListAdapter(ItemListActivity parentActivity, List<Article> dataDataModelArrayList, boolean mTwoPane){
         this.parentActivity = parentActivity;
         inflater = LayoutInflater.from(parentActivity);
         articleArrayList = dataDataModelArrayList;
