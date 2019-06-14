@@ -14,6 +14,7 @@ import android.widget.RemoteViewsService;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelStore;
@@ -49,7 +50,7 @@ public class FirstWidgetService extends RemoteViewsService  {
     }
 
 
-    class FirstWidgetViewsFactory implements RemoteViewsFactory  {
+    class FirstWidgetViewsFactory implements RemoteViewsFactory, LoaderManager.LoaderCallbacks<Cursor> {
         Context context;
         private int appWidgetId;
         LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks;
@@ -65,57 +66,17 @@ public class FirstWidgetService extends RemoteViewsService  {
 
         @Override
         public void onCreate() {
-           // fetchNewsDirectlyFromCloud();
-            fetchNewsFromContentProvider();
-            SystemClock.sleep(1000);
-         //   LoaderManager.getInstance(this).initLoader(1,null,mLoaderCallbacks);
+            fetchNewsDirectlyFromCloud();
+            //fetchNewsFromContentProvider();
 
-
-            mLoaderCallbacks =
-                    new LoaderManager.LoaderCallbacks<Cursor>() {
-
-                        @Override
-                        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-                            switch (id) {
-                                case LOADER_NEWS:
-                                    return new CursorLoader(getApplicationContext(),
-                                            NewsAppContentProvider.BASE_CONTENT_URI,
-                                            null,
-                                            null, null, null);
-                                default:
-                                    throw new IllegalArgumentException();
-                            }
-                        }
-
-                        @Override
-                        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-                            switch (loader.getId()) {
-                                case LOADER_NEWS:
-
-                                    List<Article> articles = getArticleObjectFromCursorData(data);
-                                    articleList.addAll(articles);
-                                    FirstAppWidgetProvider.sendRefreshBroadcast(context);
-                                    break;
-                            }
-                        }
-
-                        @Override
-                        public void onLoaderReset(Loader<Cursor> loader) {
-                            switch (loader.getId()) {
-                                case LOADER_NEWS:
-                                    articleList.addAll(null);
-                                    break;
-                            }
-                        }
-
-                    };
         }
 
 
 
         @Override
         public void onDataSetChanged() {
-            fetchNewsFromContentProvider();
+
+
         }
 
         @Override
@@ -256,6 +217,40 @@ public class FirstWidgetService extends RemoteViewsService  {
         }
 
 
+        @NonNull
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+            switch (id) {
+                case LOADER_NEWS:
+                    return new CursorLoader(getApplicationContext(),
+                            NewsAppContentProvider.BASE_CONTENT_URI,
+                            null,
+                            null, null, null);
+                default:
+                    throw new IllegalArgumentException();
+            }
+        }
+
+        @Override
+        public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
+            switch (loader.getId()) {
+                case LOADER_NEWS:
+
+                    List<Article> articles = getArticleObjectFromCursorData(data);
+                    articleList.addAll(articles);
+                    FirstAppWidgetProvider.sendRefreshBroadcast(context);
+                    break;
+            }
+        }
+
+        @Override
+        public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+            switch (loader.getId()) {
+                case LOADER_NEWS:
+                    articleList.addAll(null);
+                    break;
+            }
+        }
     }
 
 

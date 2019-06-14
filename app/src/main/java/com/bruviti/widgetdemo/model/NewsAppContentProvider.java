@@ -27,11 +27,12 @@ public class NewsAppContentProvider extends ContentProvider {
 
     public static final String TAG ="NewsAppContentProvider";
 
-    /** The match code for some items in the Cheese table. */
+    /** The match code for some items in the News table. */
     private static final int CODE_NEWS_ALL = 1;
 
-    /** The match code for an item in the Cheese table. */
+    /** The match code for an item in the News table. */
     private static final int CODE_NEWS_ITEM = 2;
+
     /** Content providing URI and constatnts */
     public static final String SCHEMA = "content://";
     public static final String AUTHORITY = "com.bruviti.widgetdemo.provider";
