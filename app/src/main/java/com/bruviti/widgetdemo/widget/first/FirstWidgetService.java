@@ -70,6 +70,7 @@ public class FirstWidgetService extends RemoteViewsService  {
             SystemClock.sleep(1000);
          //   LoaderManager.getInstance(this).initLoader(1,null,mLoaderCallbacks);
 
+
             mLoaderCallbacks =
                     new LoaderManager.LoaderCallbacks<Cursor>() {
 
